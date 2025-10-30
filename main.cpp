@@ -5,13 +5,14 @@
 #include <fstream>
 
 class Masina {
-public:
+private:
     int tipMasina;
     std::string culoare;
     float motorizare;
     std::string marca;
     float pret;
 
+public:
     Masina(int tip, const std::string &color, float engine, float price)
             : tipMasina(tip), culoare(color), motorizare(engine), pret(price) {}
 
@@ -25,6 +26,10 @@ public:
 
     void setMarca(const std::string &brand) {
         marca = brand;
+    }
+
+    int getTipMasina() const {
+        return tipMasina;
     }
 
     float getCustomPrice() const {
@@ -127,6 +132,11 @@ private:
     std::vector<Masina> masiniCumparate;
     float totalCost = 0;
 
+    std::vector<Masina> masini;
+    const std::vector<std::string> availableColors = {"Galben", "Negru", "Rosu", "Albastru", "Verde", "Roz"};
+    const std::vector<float> availableEngineCapacities = {1.4f, 1.6f, 2.0f, 2.5f, 3.0f};
+    const std::vector<std::string> availableBrands = {"BMW", "Audi", "Mercedes", "Volkswagen", "Mazda", "Ford"};
+
 public:
     App() {
         masini.emplace_back(1, "alb", 1.2f, 10000);
@@ -141,7 +151,7 @@ public:
         char yn;
         std::cout << "Doriti sa cumparati o masina? [Y/N]: ";
         std::cin >> yn;
-        if (yn == 'Y')
+        if (yn == 'Y' || yn == 'y')
             std::cout << "Bine ati venit!\n\n\n";
         return yn;
     }
@@ -163,6 +173,13 @@ public:
         }
 
         return selectedType;
+    }
+
+    Masina getCarCopy(size_t index) const {
+        if (index < masini.size()) {
+            return masini[index];
+        }
+        return Masina(0, "necunoscut", 0.0f, 0.0f);
     }
 
     void customizeCar(Masina &selectedCar) {
@@ -231,10 +248,12 @@ public:
         std::cout << "Total de plata: " << totalCost << '\n';
     }
 
-    const std::vector<std::string> availableColors = {"Galben", "Negru", "Rosu", "Albastru", "Verde", "Roz"};
-    const std::vector<float> availableEngineCapacities = {1.4f, 1.6f, 2.0f, 2.5f, 3.0f};
-    const std::vector<std::string> availableBrands = {"BMW", "Audi", "Mercedes", "Volkswagen", "Mazda", "Ford"};
-    std::vector<Masina> masini;
+    size_t inventorySize() const { return masini.size(); }
+    // const std::vector<std::string> availableColors = {"Galben", "Negru", "Rosu", "Albastru", "Verde", "Roz"};
+    // const std::vector<float> availableEngineCapacities = {1.4f, 1.6f, 2.0f, 2.5f, 3.0f};
+    // const std::vector<std::string> availableBrands = {"BMW", "Audi", "Mercedes", "Volkswagen", "Mazda", "Ford"};
+    // std::vector<Masina> masini;
+    //le-am pus in private
 };
 
 int App::contor = 0;
@@ -249,8 +268,8 @@ int main() {
         int selectedType = app.sQuestion();
 
         if (selectedType != 0) {
-            Masina selectedCar = app.masini[selectedType - 1];
-            std::cout << "Ati selectat masina de tip " << selectedCar.tipMasina <<std::endl;
+            Masina selectedCar = app.getCarCopy(static_cast<size_t>(selectedType - 1));
+            std::cout << "Ati selectat masina de tip " << selectedCar.getTipMasina() <<std::endl;
 
             app.customizeCar(selectedCar);
             app.buyCar(selectedCar);
