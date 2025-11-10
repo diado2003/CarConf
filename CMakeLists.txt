@@ -4,4 +4,4 @@ project(Proiect_poo)
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(Proiect_poo
-        main.cpp)
+        cppfiles/main.cpp)
