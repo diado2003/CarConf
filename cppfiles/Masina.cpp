@@ -1,10 +1,10 @@
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Masina.h"
-
+#include "../Headers/Masina.h"
 #include <string>
 #include <utility>
 
-Masina::Masina(int tip, std::string color, float engine,std::string brand, float price, int hp)
-        : tipMasina(tip), culoare(std::move(color)), motorizare(engine), pret(price), hp(hp) {}
+Masina::Masina(int tip, std::string color, float engine, float price, int hp, std::string brand)
+        : tipMasina(tip), culoare(std::move(color)), motorizare(engine), pret(price), hp(hp), marca(std::move(brand))
+{}
 
 void Masina::setCuloare(const std::string &color) {
     culoare = color;
@@ -12,6 +12,10 @@ void Masina::setCuloare(const std::string &color) {
 
 void Masina::setMotorizare(float engine) {
     motorizare = engine;
+}
+
+void Masina::setMarca(std::string newMarca) {
+    marca = newMarca;
 }
 
 float Masina::getCustomPrice() const {
@@ -85,7 +89,7 @@ int Masina::getCustomHp() const {
     else if (motorizare == 2.5) {
         customHp += 100;
     }
-    else if (motorizare == 1.4){
+    else if (motorizare == 1.4f){
         customHp+= 40;
     }
 

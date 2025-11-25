@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Masina.h"
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Customer.h"
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\App.h"
+#include "../Headers/Masina.h"
+#include "../Headers/Customer.h"
+#include "../Headers/App.h"
 
 int main() {
     App app;

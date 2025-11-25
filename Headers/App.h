@@ -3,8 +3,8 @@
 #define POO_APP_H
 
 #include <vector>
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Masina.h"
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Customer.h"
+#include "../Headers/Masina.h"
+#include "../Headers/Customer.h"
 
 class App {
 private:

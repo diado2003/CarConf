@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Masina.h"
+#include "../Headers/Masina.h"
 
 class Customer {
 private:

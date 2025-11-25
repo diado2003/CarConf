@@ -1,4 +1,4 @@
-#include "C:\Users\diana\OneDrive\Desktop\Proiect poo\Headers\Customer.h"
+#include "../Headers/Customer.h"
 
 
 Customer::Customer(const std::string& customerName, const std::string& contact)
