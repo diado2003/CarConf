@@ -1,38 +1,15 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include "../Headers/Masina.h"
-#include "../Headers/Customer.h"
 #include "../Headers/App.h"
+#include "../Headers/Exceptions.h"
+#include <iostream>
 
 int main() {
-    App app;
-    Customer customer("Diana Dospinescu", "diana-ioana.dospinescu@s.unibuc.ro");
-    std::ofstream o ("Feedback.txt");
-    std::string msg;
-
-    while (app.firstQuestion() == 'Y') {
-        int selectedType = app.sQuestion();
-
-        if (selectedType != 0) {
-            Masina selectedCar = app.masini[selectedType - 1];
-            std::cout << "Ati selectat masina de tip " << selectedCar.tipMasina <<std::endl;
-
-            app.customizeCar(selectedCar);
-            app.buyCar(selectedCar);
-            customer.buyCar(selectedCar);
-        } else {
-            std::cout << "Selectia nu este valida. Aplicatia se va inchide.\n";
-        }
+    try {
+        App app(Customer("Diana", 100000));
+        app.run();
+    } catch (const AppException& e) {
+        std::cout << "Eroare (AppException): " << e.what() << "\n";
+    } catch (const std::exception& e) {
+        std::cout << "Eroare (std::exception): " << e.what() << "\n";
     }
-
-    std::cout<<"\n\n\n";
-
-    app.displayPurchaseHistory();
-
-    std::cout<<"\n\n\n";
-
-    customer.displayPurchaseHistory();
-
     return 0;
 }

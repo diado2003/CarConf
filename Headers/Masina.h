@@ -5,25 +5,22 @@
 #include <iostream> // Required for std::ostream
 
 class Masina {
+protected:
+    std::string brand;
+    int hp{};
+    int basePrice{};
+
 public:
-    int tipMasina;
-    std::string culoare;
-    float motorizare;
-    std::string marca;
-    float pret;
-    int hp;
+    Masina(std::string brand, int hp, int basePrice);
+    virtual ~Masina() = default;
+    const std::string& getBrand() const;
+    int getBaseHp() const;
+    int getBasePrice() const;
 
-
-    Masina(int tip, std::string color, float engine, float price, int hp, std::string brand);
-
-    void setCuloare(const std::string &color);
-    void setMotorizare(float engine);
-    void setMarca(std::string marca);
-
-    [[nodiscard]] float getCustomPrice() const;
-    int getCustomHp() const;
-
-    friend std::ostream &operator<<(std::ostream &os, const Masina &masina);
+    virtual int getCustomHp() const = 0;
+    virtual int getCustomPrice() const = 0;
+    virtual void display() const = 0;
+    virtual Masina* clone() const = 0;
 };
 
 #endif

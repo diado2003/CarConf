@@ -1,34 +1,31 @@
-
 #ifndef POO_APP_H
 #define POO_APP_H
 
-#include <vector>
-#include "../Headers/Masina.h"
 #include "../Headers/Customer.h"
+#include "../Headers/Masina.h"
+#include <memory>
+#include <vector>
 
 class App {
-private:
+    std::vector<std::unique_ptr<Masina>> stock;
+    Customer customer;
+
     static int contor;
-    int nrMasini = 0;
-    std::vector<Masina> masiniCumparate;
-    float totalCost = 0;
-    int totalHP = 0;
+
 public:
-    App();
+    explicit App(Customer customer);
 
-    char firstQuestion();
-    int sQuestion();
-    void customizeCar(Masina &selectedCar);
-    void buyCar(Masina &selectedCar);
-    void displayPurchaseHistory();
-    //void Hp-KwConv();
+    App(const App& other);
+    App& operator=(App other);
+    App(App&&) noexcept = default;
+    ~App() = default;
 
+    friend void swap(App& a, App& b) noexcept;
 
-
-    const std::vector<std::string> availableColors = {"Galben", "Negru", "Rosu", "Albastru", "Verde", "Roz"};
-    const std::vector<float> availableEngineCapacities = {1.4, 1.6, 2.0, 2.5, 3.0};
-    const std::vector<std::string> availableBrands = {"BMW", "Audi", "Mercedes", "Volkswagen", "Mazda", "Ford"};
-    std::vector<Masina> masini;
+    void seedStock();
+    void listCars() const;
+    void buyCar(std::size_t index);
+    void run();
 };
 
 #endif

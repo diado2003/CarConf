@@ -1,19 +1,32 @@
 #include "../Headers/Customer.h"
+#include <iostream>
+#include <utility>
 
+Customer::Customer(std::string name_, int money_)
+    : name(std::move(name_)), money(money_) {}
 
-Customer::Customer(const std::string& customerName, const std::string& contact)
-        : name(customerName), contactInfo(contact) {}
+const std::string& Customer::getName() const { return name; }
+int Customer::getMoney() const { return money; }
 
-void Customer::buyCar(const Masina& car) {
-    purchasedCars.push_back(car);
-    totalCost += car.getCustomPrice();
+void Customer::addMoney(int amount) {
+    if (amount > 0) money += amount;
 }
 
-void Customer::displayPurchaseHistory() {
-    std::cout << "Client: " << name << " mail: (" << contactInfo << ")\n";
-    std::cout << "Masini cumparate: " << purchasedCars.size() << '\n';
-    for (const auto& car : purchasedCars) {
-        std::cout << car;
+void Customer::spendMoney(int amount) {
+    money -= amount;
+}
+
+void Customer::addPurchase(const std::string& item) {
+    purchaseHistory.push_back(item);
+}
+
+void Customer::displayPurchaseHistory() const {
+    std::cout << "Purchase history for " << name << ":\n";
+    if (purchaseHistory.empty()) {
+        std::cout << "  (empty)\n";
+        return;
     }
-    std::cout << "Cost total: " << totalCost << '\n';
+    for (const auto& x : purchaseHistory) {
+        std::cout << "  - " << x << "\n";
+    }
 }

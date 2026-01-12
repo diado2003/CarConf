@@ -1,111 +1,124 @@
 #include "../Headers/App.h"
-#include <algorithm>
+#include "../Headers/Exceptions.h"
+#include "../Headers/MasinaElectrica.h"
+#include "../Headers/MasinaSUV.h"
+#include "../Headers/MasinaSport.h"
+
 #include <iostream>
+#include <limits>
+#include <utility>
 
 int App::contor = 0;
 
-App::App() {
-    masini.emplace_back(1, "alb", 1.2, 10000, 75, "Mazda");
-    masini.emplace_back(2, "alb", 1.2, 20000, 100, "Audi");
-    masini.emplace_back(3, "alb", 1.2, 25000, 125, "Volkswagen");
-    masini.emplace_back(4, "alb", 1.2, 30000, 150, "BMW");
-    masini.emplace_back(5, "alb", 1.2, 60000, 200, "Mercedes");
-
-    nrMasini = contor++;
+App::App(Customer customer_)
+    : customer(std::move(customer_)) {
+    ++contor;
 }
 
-char App::firstQuestion() {
-    char yn;
-    std::cout << "Doriti sa cumparati o masina? [Y/N]: ";
-    std::cin >> yn;
-    if (yn == 'Y' || yn == 'y') // Added check for lowercase 'y' too
-        std::cout << "Bine ati venit!\n\n\n";
-    return yn;
-}
-
-int App::sQuestion() {
-    int selectedType = 0;
-    std::cout << "Avem disponibile urmatoarele masini: \n\n\n";
-    for (const auto &masina : masini) {
-        std::cout << masina;
+App::App(const App& other)
+    : customer(other.customer) {
+    stock.reserve(other.stock.size());
+    for (const auto& m : other.stock) {
+        stock.emplace_back(m->clone());
     }
-    std::cout << "\n\n\n";
+    ++contor;
+}
 
-    std::cout << "Introduceti tipul masinii dorite (1-" << masini.size() << "): ";
-    std::cin >> selectedType;
+void swap(App& a, App& b) noexcept {
+    using std::swap;
+    swap(a.stock, b.stock);
+    swap(a.customer, b.customer);
+    // contor rămâne global, nu îl schimbăm
+}
 
-    // Check bounds
-    if (selectedType < 1 || selectedType > (int)masini.size()) {
-        std::cout << "Tipul masinii introdus nu este valid. Va rugam selectati un numar intre 1 si " << masini.size() << ".\n";
-        selectedType = 0;
+App& App::operator=(App other) {
+    swap(*this, other);
+    return *this;
+}
+
+void App::seedStock() {
+    stock.emplace_back(std::make_unique<MasinaSport>("BMW M4", 420, 50000, 80));
+    stock.emplace_back(std::make_unique<MasinaSUV>("Volvo XC90", 300, 60000, 8));
+    stock.emplace_back(std::make_unique<MasinaElectrica>("Tesla Model 3", 280, 45000, 75));
+    stock.emplace_back(std::make_unique<MasinaSport>("Audi R8", 610, 150000, 120));
+    stock.emplace_back(std::make_unique<MasinaSUV>("Toyota RAV4", 250, 35000, 7));
+    stock.emplace_back(std::make_unique<MasinaElectrica>("Nissan Leaf", 150, 30000, 40));
+    stock.emplace_back(std::make_unique<MasinaSport>("Audi TT", 230, 40000, 60));
+}
+
+void App::listCars() const {
+    if (stock.empty()) {
+        std::cout << "Nu exista masini in stoc.\n";
+        return;
+    }
+    std::cout << "=== STOCK ===\n";
+    for (std::size_t i = 0; i < stock.size(); ++i) {
+        std::cout << i << ") ";
+        stock[i]->display(); // apel virtual prin pointer de bază
+    }
+}
+
+void App::buyCar(std::size_t index) {
+    if (index >= stock.size()) {
+        throw OutOfRange("Index invalid pentru masina.");
     }
 
-    return selectedType;
+    const auto& car = stock[index];
+    const int price = car->getCustomPrice(); // virtual "specific temei"
+
+    if (customer.getMoney() < price) {
+        throw NotEnoughMoney("Nu ai destui bani pentru aceasta masina.");
+    }
+
+    // ok: avem bani
+    customer.spendMoney(price);
+    customer.addPurchase(car->getBrand() + " | paid " + std::to_string(price));
+
+    // scoatem din stoc
+    stock.erase(stock.begin() + static_cast<long>(index));
+
+    std::cout << "Cumparare reusita! Bani ramasi: " << customer.getMoney() << "\n";
 }
-void App::customizeCar(Masina &selectedCar) {
-    char customizationChoice;
-        std::cout << "Doriti sa personalizati masina? [Y/N]: ";
-        std::cin >> customizationChoice;
 
-        if (customizationChoice == 'Y' || customizationChoice == 'y') {
-            std::string customColor;
-            float customEngineCapacity;
-            std::string customBrand;
+void App::run() {
+    seedStock();
 
-            std::cout << "Alegeti culoarea din " << availableColors.size() << " optiuni: ";
-            for (const auto &color : availableColors) {
-                std::cout << color << " ";
+    while (true) {
+        std::cout << "\nCustomer: " << customer.getName()
+                  << " | Money: " << customer.getMoney()
+                  << " | App instances: " << contor << "\n";
+
+        std::cout << "1) List cars\n"
+                  << "2) Buy car (by index)\n"
+                  << "3) Show purchase history\n"
+                  << "0) Exit\n"
+                  << "Choose: ";
+
+        int opt;
+        if (!(std::cin >> opt)) {
+            // input invalid -> curățăm și aruncăm
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            throw InvalidOption("Input invalid (nu e numar).");
+        }
+
+        if (opt == 0) return;
+
+        if (opt == 1) {
+            listCars();
+        } else if (opt == 2) {
+            std::cout << "Index: ";
+            std::size_t idx;
+            if (!(std::cin >> idx)) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                throw InvalidOption("Index invalid.");
             }
-            std::cout << "\nCuloare: ";
-            std::cin >> customColor;
-
-            if (std::find(availableColors.begin(), availableColors.end(), customColor) != availableColors.end()) {
-                std::cout << "Alegeti capacitatea motorului din " << availableEngineCapacities.size()
-                          << " optiuni: ";
-                for (const auto &engine : availableEngineCapacities) {
-                    std::cout << engine << " ";
-                }
-                std::cout << "\nCapacitate motor: ";
-                std::cin >> customEngineCapacity;
-
-                if (std::find(availableEngineCapacities.begin(), availableEngineCapacities.end(), customEngineCapacity) != availableEngineCapacities.end()) {
-                    std::cout << "Alegeti marca masinii din " << availableBrands.size() << " optiuni: ";
-                    for (const auto &brand : availableBrands) {
-                        std::cout << brand << " ";
-                    }
-                    std::cout << "\nMarca: ";
-                    std::cin >> customBrand;
-
-                    if (std::find(availableBrands.begin(), availableBrands.end(), customBrand) != availableBrands.end()) {
-                        selectedCar.setCuloare(customColor);
-                        selectedCar.setMotorizare(customEngineCapacity);
-                        selectedCar.setMarca(customBrand);
-                        std::cout << "Masina a fost personalizata cu succes!\n";
-                    } else {
-                        std::cout << "Marca aleasa nu este valida. Masina va ramane neschimbata.\n";
-                    }
-                } else {
-                    std::cout << "Capacitatea motorului aleasa nu este valida. Masina va ramane neschimbata.\n";
-                }
-            } else {
-                std::cout << "Culoarea aleasa nu este valida. Masina va ramane neschimbata.\n";
-            }
+            buyCar(idx);
+        } else if (opt == 3) {
+            customer.displayPurchaseHistory();
         } else {
-            std::cout << "Ati ales o masina standard:\n";
+            throw InvalidOption("Optiune inexistenta.");
         }
     }
-
-
-void App::buyCar(Masina &selectedCar) {
-    masiniCumparate.push_back(selectedCar);
-    totalCost += selectedCar.getCustomPrice();
-    totalHP += selectedCar.getCustomPrice();
-}
-
-void App::displayPurchaseHistory() {
-    std::cout << "Ati cumparat " << masiniCumparate.size() << " masini:\n";
-    for (const auto &car : masiniCumparate) {
-        std::cout << car;
-    }
-    std::cout << "Total de plata: " << totalCost << '\n';
 }

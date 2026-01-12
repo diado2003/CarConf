@@ -3,21 +3,22 @@
 
 #include <string>
 #include <vector>
-#include "../Headers/Masina.h"
 
 class Customer {
-private:
     std::string name;
-    std::string contactInfo;
-    std::vector<Masina> purchasedCars;
-    float totalCost = 0;
-    std::vector<Customer> Clients;
+    int money{};
+    std::vector<std::string> purchaseHistory;
 
 public:
-    Customer(const std::string& customerName, const std::string& contact);
+    Customer(std::string name, int money);
 
-    void buyCar(const Masina& car);
-    void displayPurchaseHistory();
+    const std::string& getName() const;
+    int getMoney() const;
+
+    void addMoney(int amount);
+    void spendMoney(int amount);
+    void addPurchase(const std::string& item);
+    void displayPurchaseHistory() const;
 };
 
 #endif

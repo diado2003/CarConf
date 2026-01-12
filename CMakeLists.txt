@@ -8,6 +8,13 @@ add_executable(Proiect_poo
         cppfiles/Masina.cpp
         cppfiles/Customer.cpp
         cppfiles/App.cpp
+        cppfiles/MasinaSport.cpp
+        cppfiles/MasinaSUV.cpp
+        cppfiles/MasinaElectrica.cpp
         Headers/Masina.h
         Headers/Customer.h
-        Headers/App.h)
+        Headers/App.h
+        Headers/MasinaSport.h
+        Headers/Exceptions.h)
+
+
